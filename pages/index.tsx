@@ -1,19 +1,27 @@
-import * as React from 'react'
-import Link from 'next/link'
-import Layout from '../components/Layout'
-import { NextPage } from 'next'
+import React, { useEffect } from 'react';
+import { NextPage } from 'next';
+import unfetch from 'isomorphic-unfetch';
 
 const IndexPage: NextPage = () => {
-  return (
-    <Layout title="Home | Next.js + TypeScript Example">
-      <h1>Hello Next.js 👋</h1>
-      <p>
-        <Link href="/about">
-          <a>About</a>
-        </Link>
-      </p>
-    </Layout>
-  )
-}
+  useEffect(() => {
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const res = await unfetch('/api/parse', { signal: controller.signal });
+        const json = await res.json();
 
-export default IndexPage
+        console.log(json);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  return <h2>hello world</h2>;
+};
+
+export default IndexPage;

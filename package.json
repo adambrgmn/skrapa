@@ -1,23 +1,66 @@
 {
-  "name": "with-typescript",
+  "name": "@fransvilhelm/skrapa",
   "version": "1.0.0",
+  "license": "MIT",
   "scripts": {
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "test": "jest"
   },
   "dependencies": {
     "isomorphic-unfetch": "3.0.0",
     "next": "latest",
     "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react-dom": "^16.12.0",
+    "xlsx": "^0.15.4"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.4.0",
     "@types/node": "^12.12.21",
     "@types/react": "^16.9.16",
     "@types/react-dom": "^16.9.4",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "babel-eslint": "10.x",
+    "cz-conventional-changelog": "^3.0.2",
+    "eslint": "6.x",
+    "eslint-config-react-app": "5.0.2",
+    "eslint-plugin-flowtype": "3.x",
+    "eslint-plugin-import": "2.x",
+    "eslint-plugin-jsx-a11y": "6.x",
+    "eslint-plugin-react": "7.x",
+    "eslint-plugin-react-hooks": "1.x",
+    "husky": "^4.0.9",
+    "jest": "^24.9.0",
+    "lint-staged": "^9.5.0",
+    "prettier": "^1.19.1",
     "typescript": "3.7.3"
   },
-  "license": "ISC"
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx,json,md,yml,html}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "proseWrap": "always"
+  }
 }
