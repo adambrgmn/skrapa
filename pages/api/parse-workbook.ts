@@ -16,7 +16,7 @@ const parseRequest = (
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
-    return res.status(403);
+    return res.status(403).json({ status: 'Forbidden' });
   }
 
   try {
@@ -27,7 +27,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     return res.status(200).json({ links });
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ status: 'Internal Server Error', error });
   }
 };
 
