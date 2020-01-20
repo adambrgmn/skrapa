@@ -71,6 +71,23 @@ const IndexPage: NextPage = () => {
     setFormData(body);
   };
 
+  const handleTestButton = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+
+    fetch('/api/extract-selector', {
+      method: 'POST',
+      body: JSON.stringify({
+        url:
+          'https://www.sjomackar.se/omradesindelat/gotakanal-vattern-vanern/item/pr-green-petrolium-hoensaeters-hamn-haellekis',
+        selector:
+          '#yoo-zoo > div > div.floatbox > div.address > div.pos-contact > ul > li.element.element-text.first',
+      }),
+    })
+      .then(res => res.json())
+      .then(data => console.log(data))
+      .catch(error => console.error(error));
+  };
+
   return (
     <form onSubmit={handleSubmit} onReset={reset}>
       <label htmlFor="workbook">
@@ -88,6 +105,9 @@ const IndexPage: NextPage = () => {
         Submit
       </button>
       <button type="reset">Reset</button>
+      <button type="button" onClick={handleTestButton}>
+        Test
+      </button>
     </form>
   );
 };

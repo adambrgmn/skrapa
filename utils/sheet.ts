@@ -41,8 +41,13 @@ export const sheetToArray = (
   return result;
 };
 
-export const extractUrls = (workbook: XLSX.WorkBook) => {
-  const links: string[] = [];
+interface Link {
+  url: string;
+  title: string | null;
+}
+
+export const extractUrls = (workbook: XLSX.WorkBook): Link[] => {
+  const links: Link[] = [];
 
   for (const sheetName of workbook.SheetNames) {
     const sheet = workbook.Sheets[sheetName];
@@ -53,12 +58,15 @@ export const extractUrls = (workbook: XLSX.WorkBook) => {
         if (!cell) continue;
 
         if (isString(cell.v) && isValidUrl(cell.v)) {
-          links.push(cell.v);
+          links.push({ url: cell.v, title: null });
           continue;
         }
 
         if (cell.l && isValidUrl(cell.l.Target)) {
-          links.push(cell.l.Target);
+          links.push({
+            url: cell.l.Target,
+            title: isString(cell.v) ? cell.v : null,
+          });
         }
       }
     }

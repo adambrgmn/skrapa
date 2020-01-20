@@ -1,10 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import Yup from 'yup';
+import * as Yup from 'yup';
+import fetch from 'isomorphic-unfetch';
 import { reWebURL } from '../../utils/isValidUrl';
+import { extractSelector } from '../../utils/html';
 
 interface Body {
   url: string;
-  xpath: string;
+  selector: string;
 }
 
 interface Request extends NextApiRequest {
@@ -15,8 +17,8 @@ const schema = Yup.object<Body>({
   url: Yup.string()
     .matches(reWebURL, 'The url provided is not valid')
     .required(),
-  xpath: Yup.string().required(
-    'You need to provide an xpath to extract from the url',
+  selector: Yup.string().required(
+    'You need to provide a selector to extract from the url',
   ),
 });
 
@@ -25,7 +27,11 @@ export default async (req: Request, res: NextApiResponse) => {
 
   try {
     const body = await schema.validate(req.body);
-    res.status(200).json({ body });
+
+    const html = await fetch(body.url).then(r => r.text());
+    const content = extractSelector(html, body.selector);
+
+    res.status(200).json({ content });
   } catch (error) {
     if (isValidationError(error)) {
       return res.status(400).json({ error });
