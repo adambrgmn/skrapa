@@ -3,15 +3,7 @@ import * as Yup from 'yup';
 import fetch from 'isomorphic-unfetch';
 import { reWebURL } from '../../utils/isValidUrl';
 import { extractSelector } from '../../utils/html';
-
-interface Body {
-  url: string;
-  selector: string;
-}
-
-interface Request extends NextApiRequest {
-  body: Body;
-}
+import { isValidationError } from '../../utils';
 
 const schema = Yup.object<Body>({
   url: Yup.string()
@@ -22,7 +14,10 @@ const schema = Yup.object<Body>({
   ),
 });
 
-export default async (req: Request, res: NextApiResponse) => {
+export default async (
+  req: NextApiRequest & { body: Body },
+  res: NextApiResponse<Response | ErrorResponse>,
+) => {
   if (req.method !== 'POST') return res.status(403);
 
   try {
@@ -31,16 +26,25 @@ export default async (req: Request, res: NextApiResponse) => {
     const html = await fetch(body.url).then(r => r.text());
     const content = extractSelector(html, body.selector);
 
-    res.status(200).json({ content });
+    return res.status(200).json({ content });
   } catch (error) {
     if (isValidationError(error)) {
-      return res.status(400).json({ error });
+      return res.status(400).json({ message: error.message });
     }
 
-    return res.status(500).json({ status: 'Internal Server Error', error });
+    return res.status(500).json({ message: error.message });
   }
 };
 
-const isValidationError = (err: any): err is Yup.ValidationError => {
-  return err.name === 'ValidationError';
-};
+export interface Body {
+  url: string;
+  selector: string;
+}
+
+export interface Response {
+  content: string;
+}
+
+export interface ErrorResponse {
+  message: string;
+}

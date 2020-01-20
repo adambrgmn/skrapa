@@ -1,114 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { NextPage } from 'next';
-import unfetch from 'isomorphic-unfetch';
-
-const useForceUpdate = () => {
-  const [count, setCount] = useState(0);
-  return () => setCount(count + 1);
-};
-
-type InputProps = React.DetailedHTMLProps<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->;
-interface FileInputProps extends Omit<InputProps, 'value' | 'type'> {
-  files?: FileList | null;
-}
-
-const FileInput: React.FC<FileInputProps> = ({ files, onChange, ...props }) => {
-  const ref = useRef<HTMLInputElement>(null);
-  const forceUpdate = useForceUpdate();
-
-  useEffect(() => {
-    if (!ref.current) return;
-    if (!files) ref.current.value = '';
-  });
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    forceUpdate();
-    if (onChange) onChange(event);
-  };
-
-  return <input ref={ref} type="file" onChange={handleChange} {...props} />;
-};
+import { WorkbookUploadForm } from '../components/WorkbookUploadForm';
+import { SheetUrl } from '../utils/sheet';
+import { UrlTable } from '../components/UrlTable';
+import { unique } from '../utils/array';
 
 const IndexPage: NextPage = () => {
-  const [files, setFiles] = useState<FileList | null>(null);
-  const [formData, setFormData] = useState<FormData | null>();
-
-  const reset = (event?: React.FormEvent<Element>) => {
-    if (event) event.preventDefault();
-    setFormData(null);
-    setFiles(null);
-  };
-
-  useEffect(() => {
-    if (!formData) return;
-    const controller = new AbortController();
-
-    unfetch('/api/parse-workbook', {
-      method: 'POST',
-      body: formData,
-      signal: controller.signal,
-    })
-      .then(res => res.json())
-      .then(data => console.log(data))
-      .catch(error => {
-        if (error.name === 'AbortError') console.log('aborted');
-        else console.log(error);
-      })
-      .finally(() => reset());
-
-    return () => controller.abort();
-  }, [formData]);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!files) return;
-    const body = new FormData();
-    body.append('workbook', files[0]);
-    setFormData(body);
-  };
-
-  const handleTestButton = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-
-    fetch('/api/extract-selector', {
-      method: 'POST',
-      body: JSON.stringify({
-        url:
-          'https://www.sjomackar.se/omradesindelat/gotakanal-vattern-vanern/item/pr-green-petrolium-hoensaeters-hamn-haellekis',
-        selector:
-          '#yoo-zoo > div > div.floatbox > div.address > div.pos-contact > ul > li.element.element-text.first',
-      }),
-    })
-      .then(res => res.json())
-      .then(data => console.log(data))
-      .catch(error => console.error(error));
-  };
+  const [urls, setUrls] = useState<SheetUrl[]>([]);
 
   return (
-    <form onSubmit={handleSubmit} onReset={reset}>
-      <label htmlFor="workbook">
-        <span>Select file</span>
-        <FileInput
-          id="workbook"
-          name="workbook"
-          accept=".xls, .xlsx"
-          files={files}
-          onChange={event => setFiles(event.currentTarget.files)}
-        />
-      </label>
-
-      <button type="submit" disabled={!files}>
-        Submit
-      </button>
-      <button type="reset">Reset</button>
-      <button type="button" onClick={handleTestButton}>
-        Test
-      </button>
-    </form>
+    <React.Fragment>
+      <WorkbookUploadForm onUrlsExtracted={setUrls} />
+      <UrlTable urls={unique(urls, ({ url }) => url).slice(0, 5)} />
+    </React.Fragment>
   );
 };
 

@@ -41,13 +41,13 @@ export const sheetToArray = (
   return result;
 };
 
-interface Link {
+export interface SheetUrl {
   url: string;
   title: string | null;
 }
 
-export const extractUrls = (workbook: XLSX.WorkBook): Link[] => {
-  const links: Link[] = [];
+export const extractUrls = (workbook: XLSX.WorkBook): SheetUrl[] => {
+  const links: SheetUrl[] = [];
 
   for (const sheetName of workbook.SheetNames) {
     const sheet = workbook.Sheets[sheetName];

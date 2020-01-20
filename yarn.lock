@@ -1289,6 +1289,13 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.24.tgz#d4606afd8cf6c609036b854360367d1b2c78931f"
   integrity sha512-1Ciqv9pqwVtW6FsIUKSZNB82E5Cu1I2bBTj1xuIHXLe/1zYLl3956Nbhg2MzSYHVfl9/rmanjbQIb7LibfCnug==
 
+"@types/p-queue@^3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@types/p-queue/-/p-queue-3.2.1.tgz#614957d9ed05cf6e02d08ed8f09041c4d100ef70"
+  integrity sha512-tgAdn5zEs05NuHzOyRM34cMO0rczStphR/kLo/ZJwwwJ5S2+QVxwA6gST3vDHWPB1oDfUuT6wOouhJvJkBCA0w==
+  dependencies:
+    p-queue "*"
+
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
@@ -3701,6 +3708,11 @@ etag@1.8.1, etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
+
+eventemitter3@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.0.tgz#d65176163887ee59f386d64c82610b696a4a74eb"
+  integrity sha512-qerSRB0p+UDEssxTtm6EDKcE7W4OaoisfIMl4CngyEhjpYglocpNg6UEqCvemdGhosAsg4sO2dXJOdyBifPGCg==
 
 events@^3.0.0:
   version "3.1.0"
@@ -6609,10 +6621,25 @@ p-map@^3.0.0:
   dependencies:
     aggregate-error "^3.0.0"
 
+p-queue@*, p-queue@^6.2.1:
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-6.2.1.tgz#809a832046451b2240a0a8e48b4fa18192b22b64"
+  integrity sha512-wV8yC/rkuWpgu9LGKJIb48OynYSrE6lVl2Bx6r8WjbyVKrFAzzQ/QevAvwnDjlD+mLt8xy0LTDOU1freOvMTCg==
+  dependencies:
+    eventemitter3 "^4.0.0"
+    p-timeout "^3.1.0"
+
 p-reduce@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-reduce/-/p-reduce-1.0.0.tgz#18c2b0dd936a4690a529f8231f58a0fdb6a47dfa"
   integrity sha1-GMKw3ZNqRpClKfgjH1ig/bakffo=
+
+p-timeout@^3.1.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/p-timeout/-/p-timeout-3.2.0.tgz#c7e17abc971d2a7962ef83626b35d635acf23dfe"
+  integrity sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==
+  dependencies:
+    p-finally "^1.0.0"
 
 p-try@^1.0.0:
   version "1.0.0"
