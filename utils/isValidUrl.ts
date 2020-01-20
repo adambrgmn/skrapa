@@ -1,5 +1,5 @@
 // From https://gist.github.com/dperini/729294
-const reWebURL = new RegExp(
+export const reWebURL = new RegExp(
   '^' +
     // protocol identifier (optional)
     // short syntax // still required

@@ -1,18 +1,23 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Yup from 'yup';
+import { reWebURL } from '../../utils/isValidUrl';
 
 interface Body {
-  links: string[];
+  url: string;
+  xpath: string;
 }
+
 interface Request extends NextApiRequest {
   body: Body;
 }
 
 const schema = Yup.object<Body>({
-  links: Yup.array(Yup.string())
-    .min(1, 'At least one link needs to be provided')
-    .max(10, 'No more than ten links are allowed per request')
-    .required('An array of links must be provided'),
+  url: Yup.string()
+    .matches(reWebURL, 'The url provided is not valid')
+    .required(),
+  xpath: Yup.string().required(
+    'You need to provide an xpath to extract from the url',
+  ),
 });
 
 export default async (req: Request, res: NextApiResponse) => {
