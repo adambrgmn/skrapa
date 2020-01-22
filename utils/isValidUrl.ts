@@ -42,8 +42,4 @@ export const reWebURL = new RegExp(
   'i',
 );
 
-export const isValidUrl = (possibleUrl: string) => {
-  return reWebURL.test(possibleUrl);
-};
-
-module.exports = { isValidUrl };
+export const isValidUrl = (possibleUrl: string) => reWebURL.test(possibleUrl);

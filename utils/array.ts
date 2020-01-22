@@ -1,10 +1,15 @@
-const id = <T, U>(item: T): U => (item as unknown) as U;
+const id = <T, V>(item: T): V => (item as unknown) as V;
 
-export const unique = <T, U>(items: T[], getKey: (item: T) => U = id): T[] => {
+type GetComparableValueFn<T, V> = (item: T) => V;
+
+export const unique = <T, V>(
+  items: T[],
+  getValue: GetComparableValueFn<T, V> = id,
+): T[] => {
   const filteredItems: T[] = [];
   for (let item of items) {
-    const key = getKey(item);
-    if (filteredItems.findIndex(otherItem => getKey(otherItem) === key) < 0) {
+    const key = getValue(item);
+    if (filteredItems.findIndex(otherItem => getValue(otherItem) === key) < 0) {
       filteredItems.push(item);
     }
   }
