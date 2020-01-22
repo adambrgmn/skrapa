@@ -1,63 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import PQueue from 'p-queue';
-import { SheetUrl } from '../utils/sheet';
 import {
   Body as ExtractSelectorBody,
   Response as ExtractSelectorResponse,
 } from '../pages/api/extract-selector';
+import { Urls } from './WorkbookUploadForm';
+import { createUseQueuedFetch } from '../hooks/useFetch';
 
-const queue = new PQueue({ concurrency: 2 });
+const useQueuedFetch = createUseQueuedFetch({ concurrency: 2 });
 
 const TableRow: React.FC<TableRowProps> = ({ url, title, generalSelector }) => {
-  const [selector, setSelector] = useState(generalSelector);
-  const [hasUpdatedSelector, setHasUpdatedSelector] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState('');
+  const [selector, setSelector] = useState('');
+
+  const [state, load] = useQueuedFetch<
+    ExtractSelectorResponse,
+    ExtractSelectorBody
+  >('/api/extract-selector', {
+    lazy: true,
+    method: 'POST',
+    body: { url, selector: selector || generalSelector },
+  });
 
   useEffect(() => {
-    if (!hasUpdatedSelector) setSelector(generalSelector);
-  }, [generalSelector, hasUpdatedSelector]);
-
-  useEffect(() => {
-    if (!url || !selector) return;
-
-    setLoading(true);
-
-    const controller = new AbortController();
-    const body: ExtractSelectorBody = { url, selector };
-
-    queue
-      .add(() =>
-        fetch('/api/extract-selector', {
-          method: 'POST',
-          body: JSON.stringify(body),
-          signal: controller.signal,
-        }),
-      )
-      .then(r => r.json())
-      .then((data: ExtractSelectorResponse) => setData(data.content))
-      .catch(error => console.error(error))
-      .finally(() => setLoading(false));
-
-    return () => controller.abort();
-  }, [url, selector]);
+    if (selector.length > 0 || generalSelector.length > 0) load();
+  }, [selector, generalSelector, load]);
 
   const handleSelectorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelector(event.currentTarget.value);
-    setHasUpdatedSelector(true);
   };
 
   return (
     <tr>
       <th scope="row">{title ?? '-'}</th>
       <td>{url}</td>
-      <td>{loading ? 'Loading...' : data.length < 1 ? 'Waiting' : data}</td>
+      <td>
+        {state.status === 'initital' && '...'}
+        {state.status === 'loading' && 'Loading...'}
+        {state.status === 'rejected' && 'Error: ' + state.error.message}
+        {state.status === 'resolved' && state.data.content}
+      </td>
       <td>
         <label htmlFor={'selector-' + url}>
           <input
             type="text"
             id={'selector-' + url}
             name="selector"
+            placeholder={generalSelector}
             value={selector}
             onChange={handleSelectorChange}
           />
@@ -109,9 +96,9 @@ export const UrlTable: React.FC<Props> = ({ urls }) => {
         </thead>
 
         <tbody>
-          {urls.map(({ title, url }) => (
+          {urls.map(({ id, title, url }) => (
             <TableRow
-              key={url}
+              key={id}
               url={url}
               title={title}
               generalSelector={selector}
@@ -127,5 +114,5 @@ export const UrlTable: React.FC<Props> = ({ urls }) => {
 };
 
 interface Props {
-  urls: SheetUrl[];
+  urls: Urls[];
 }

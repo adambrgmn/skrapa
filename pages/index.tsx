@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { NextPage } from 'next';
-import { WorkbookUploadForm } from '../components/WorkbookUploadForm';
-import { SheetUrl } from '../utils/sheet';
+import { WorkbookUploadForm, Urls } from '../components/WorkbookUploadForm';
 import { UrlTable } from '../components/UrlTable';
-import { unique } from '../utils/array';
 
 const IndexPage: NextPage = () => {
-  const [urls, setUrls] = useState<SheetUrl[]>([]);
+  const [urls, setUrls] = useState<Urls[]>([]);
 
   return (
     <React.Fragment>
       <WorkbookUploadForm onUrlsExtracted={setUrls} />
-      <UrlTable urls={unique(urls, ({ url }) => url).slice(0, 5)} />
+      <UrlTable
+        urls={process.env.NODE_ENV === 'development' ? urls.slice(0, 5) : urls}
+      />
     </React.Fragment>
   );
 };

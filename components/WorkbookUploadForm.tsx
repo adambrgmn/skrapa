@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import unfetch from 'isomorphic-unfetch';
 import { FileInput } from './FileInput';
 import { SheetUrl } from '../utils/sheet';
-import { Response as ParseWorkbookResponse } from '../pages/api/parse-workbook';
+import { Response as ParseWorkbookResponse } from '../pages/api/extract-urls';
+import { unique } from '../utils/array';
+import nanoid from 'nanoid';
+
+export interface Urls extends SheetUrl {
+  id: string;
+}
 
 export const WorkbookUploadForm: React.FC<Props> = ({ onUrlsExtracted }) => {
   const callbackRef = useRef(onUrlsExtracted);
@@ -17,13 +22,20 @@ export const WorkbookUploadForm: React.FC<Props> = ({ onUrlsExtracted }) => {
     if (!formData) return;
     const controller = new AbortController();
 
-    unfetch('/api/parse-workbook', {
+    fetch('/api/extract-urls', {
       method: 'POST',
       body: formData,
       signal: controller.signal,
     })
       .then(res => res.json())
-      .then((data: ParseWorkbookResponse) => callbackRef.current(data.urls))
+      .then((data: ParseWorkbookResponse) =>
+        callbackRef.current(
+          unique(data.urls, ({ url }) => url).map(item => ({
+            ...item,
+            id: nanoid(),
+          })),
+        ),
+      )
       .catch(error => {
         if (error.name === 'AbortError') console.log('aborted');
         else console.log(error);
@@ -70,5 +82,5 @@ export const WorkbookUploadForm: React.FC<Props> = ({ onUrlsExtracted }) => {
 };
 
 interface Props {
-  onUrlsExtracted: (urls: SheetUrl[]) => void;
+  onUrlsExtracted: (urls: Urls[]) => void;
 }
